@@ -1,16 +1,34 @@
-const Log = require('../models/logModel.js');
+const User = require('../models/userModel.js');
+const Exercise = require('../models/exerciseModel.js');
 
 const getAllLogsForUser = async (req,res) => {
-    try {
-        const logs = await Log.find({_id:req.params._id}); 
-        res.status(200).json(logs);
-    } catch (error) {
-        res.status(500).json({message:'Error getting all logs'});
-    }
-}
+    console.log(req.query.from)
+    console.log(req.query.to)
+    console.log(req.query.limit)
 
-const createLog = async (req,res) => {
-    
+    const user = await User.findById(req.params._id);
+    const exercises = await Exercise.find({_id:req.params._id});
+
+    const exercisesForAUser = [];
+
+    for (let i = 0; i < exercises.length; i++) {
+        exercisesForAUser.push(JSON.parse(JSON.stringify(exercises))[0])
+    } 
+
+    for(let i = 0; i < exercisesForAUser.length; i++){ 
+        exercisesForAUser[i].date = new Date(exercisesForAUser[i].date).toDateString(); 
+    }
+
+    const username = user.username;
+    const count = exercisesForAUser.length;
+    const _id = req.params._id;
+    const log = exercisesForAUser;
+
+    const logObject = {username:username,count:count,_id:_id,log:log}; 
+
+    //console.log(logObject)
+
+    res.status(200).json(logObject);
 }
 
 module.exports = {

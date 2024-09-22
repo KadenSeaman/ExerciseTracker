@@ -18,16 +18,9 @@ const userRoute = require('./routes/userRoute.js')
 const exerciseRoute = require('./routes/exerciseRoute.js');
 const logRoute = require('./routes/logRoute.js');
 
-
-
-
-
-
-
-
 app.use('/api/users', userRoute);
 app.use('/api/users/:_id/exercises', exerciseRoute);
-app.use('/api/user/:_id/logs', logRoute);
+app.use('/api/users/:_id/logs', logRoute);
 
 app.get('/', (req,res) => {
   res.sendFile(__dirname + '/views/index.html')
