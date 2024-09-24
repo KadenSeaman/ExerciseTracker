@@ -1,34 +1,39 @@
 const User = require('../models/userModel.js');
 const Exercise = require('../models/exerciseModel.js');
+const { response } = require('express');
 
 const getAllLogsForUser = async (req,res) => {
-    console.log(req.query.from)
-    console.log(req.query.to)
-    console.log(req.query.limit)
 
-    const user = await User.findById(req.params._id);
-    const exercises = await Exercise.find({_id:req.params._id});
+    let logs = await Exercise.find({userID:req.params._id});
 
-    const exercisesForAUser = [];
+    logs = JSON.parse(JSON.stringify(logs));
 
-    for (let i = 0; i < exercises.length; i++) {
-        exercisesForAUser.push(JSON.parse(JSON.stringify(exercises))[0])
-    } 
+    logs.forEach(log => {
+        log.date = new Date(log.date).toDateString();
+    })
 
-    for(let i = 0; i < exercisesForAUser.length; i++){ 
-        exercisesForAUser[i].date = new Date(exercisesForAUser[i].date).toDateString(); 
+    if(req.query.from || req.query.to){
+        logs = logs.filter(log => {
+            const fromDate = new Date(req.query.from).getTime();
+            const toDate = new Date(req.query.to).getTime();
+            const logDate = new Date(log.date).getTime();
+            return logDate <= toDate && logDate >= fromDate;
+        })
     }
 
-    const username = user.username;
-    const count = exercisesForAUser.length;
-    const _id = req.params._id;
-    const log = exercisesForAUser;
+    if(req.query.limit){
+        logs = logs.slice(0,req.query.limit);
+    }
 
-    const logObject = {username:username,count:count,_id:_id,log:log}; 
 
-    //console.log(logObject)
+    const log = {
+        username: logs[0].username,
+        count: logs.length,
+        _id: logs[0].userID,
+        log: logs
+    }
 
-    res.status(200).json(logObject);
+    res.json(log)
 }
 
 module.exports = {

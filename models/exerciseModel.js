@@ -2,10 +2,6 @@ const mongoose = require('mongoose');
 
 
 const exerciseSchema = mongoose.Schema({
-    _id:{
-        type: String,
-        required: true,
-    },
     username: {
         type: String,
         required: true,
@@ -21,8 +17,7 @@ const exerciseSchema = mongoose.Schema({
     date: {
         type: Date,
     },
-},{
-    timestamps:true
+    userID: String
 });
 
 const Exercise = mongoose.model('exercise', exerciseSchema);

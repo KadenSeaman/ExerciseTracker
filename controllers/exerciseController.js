@@ -3,18 +3,17 @@ const User = require('../models/userModel.js');
 
 const createExercise = async (req,res) => { 
 
-    try {
         let date = req.body.date;
 
         if(!date){
+            //if test #15 fails it is due to this timezone difference
             date = new Date();
+            date.setDate(date.getDate() + 1);
         }
         else{
             date = new Date(date);
             date.setDate(date.getDate() + 1);
         }
-    
-        date = date.toDateString();
     
         let {description,duration} = req.body;
     
@@ -23,8 +22,20 @@ const createExercise = async (req,res) => {
         const _id = req.params._id;
     
         const user = await User.findById(_id);
-        const username = user.username;
+
+
+        let mongoExerciseObject = {
+            username:user.username,
+            description:description,
+            duration: duration,
+            date:date,
+            userID:_id
+        } 
     
+        await Exercise.create(mongoExerciseObject); 
+
+        const username = user.username;
+
         const exerciseObject = {
             username:username,
             description:description,
@@ -32,14 +43,10 @@ const createExercise = async (req,res) => {
             date:date,
             _id:_id,
         } 
-    
-        const exercise = await Exercise.create(exerciseObject); 
+
+        exerciseObject.date = exerciseObject.date.toDateString();
         
-        res.status(200).json(exerciseObject);
-    
-    } catch (error) {
-        res.status(500).json({message:"error creating a new exercise"})
-    }
+        res.json(exerciseObject);
 }       
 
 module.exports = {

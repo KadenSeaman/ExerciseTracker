@@ -5,8 +5,6 @@ const userSchema = mongoose.Schema({
         type: String,
         required: [true, "Please enter in a username"]
     },
-},{
-    timestamps:true,
 });
 
 const User = mongoose.model('user',userSchema);
